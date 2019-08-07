@@ -1,14 +1,23 @@
 pipeline {
   agent any
-  tools {
-    nvm-wrapper '10.16.0'
-  }
 
   options {
     timeout(time: 2, unit: 'MINUTES')
   }
 
   stages {
+    stage("Install NodeJS") {
+      steps {
+        nvm(nvmInstallURL: 'https://raw.githubusercontent.com/creationix/nvm/v0.33.11/install.sh', 
+            nvmIoJsOrgMirror: 'https://iojs.org/dist',
+            nvmNodeJsOrgMirror: 'https://nodejs.org/dist', 
+            version: '10.16.0') {
+          sh "npm install"
+          echo "Build main site distribution"
+          sh "npm run build:dist"
+        }
+      }
+    }
     stage('Install dependencies') {
       steps {
         sh 'cd jenkins-tests && npm i'
